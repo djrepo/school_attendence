@@ -1,0 +1,14 @@
+services:
+  school-attendance:
+    container_name: school-attendance
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    mem_reservation: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - "school-attendance-network"
+
+networks:
+  school-attendance-network:

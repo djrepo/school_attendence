@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AttendanceService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">school attendance enrollment backend</a> &gt; <a href="index.source.html" class="el_package">com.upwork.schoolattendance.services</a> &gt; <span class="el_source">AttendanceService.java</span></div><h1>AttendanceService.java</h1><pre class="source lang-java linenums">package com.upwork.schoolattendance.services;
+
+import com.upwork.schoolattendance.model.Lesson;
+import com.upwork.schoolattendance.model.User;
+import com.upwork.schoolattendance.model.Attendance;
+import com.upwork.schoolattendance.repository.AttendanceRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+<span class="fc" id="L16">@Slf4j</span>
+<span class="fc" id="L17">@RequiredArgsConstructor</span>
+public class AttendanceService {
+
+    private final AttendanceRepository attendanceRepository;
+    private final EntityManager entityManager;
+
+    public List&lt;Attendance&gt; getAttendanceForUserAndDateTime(Long userId, LocalDateTime time) {
+<span class="fc" id="L24">        return attendanceRepository.listAttendanceOnSpecificTime(userId, time);</span>
+    }
+
+    public void addAttendance(long userId, long lessonId) {
+<span class="fc" id="L28">        User user = entityManager.getReference(User.class, userId);</span>
+<span class="fc" id="L29">        Lesson lesson = entityManager.getReference(Lesson.class, lessonId);</span>
+<span class="fc" id="L30">        Attendance attendance = new Attendance();</span>
+<span class="fc" id="L31">        attendance.setPresenceAt(LocalDateTime.now());</span>
+<span class="fc" id="L32">        attendance.setUser(user);</span>
+<span class="fc" id="L33">        attendance.setLesson(lesson);</span>
+<span class="fc" id="L34">        attendanceRepository.save(attendance);</span>
+<span class="fc" id="L35">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

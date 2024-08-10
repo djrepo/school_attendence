@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CheckInService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">school attendance enrollment backend</a> &gt; <a href="index.source.html" class="el_package">com.upwork.schoolattendance.services</a> &gt; <span class="el_source">CheckInService.java</span></div><h1>CheckInService.java</h1><pre class="source lang-java linenums">package com.upwork.schoolattendance.services;
+
+import com.upwork.schoolattendance.model.exception.BadTokenException;
+import com.upwork.schoolattendance.model.exception.ConflictException;
+import com.upwork.schoolattendance.resources.errors.PropertyFile;
+import com.upwork.schoolattendance.resources.model.CheckInRequest;
+import com.upwork.schoolattendance.resources.model.CheckInTokenPayload;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
+import javax.validation.ConstraintViolationException;
+
+@Service
+<span class="fc" id="L16">@Slf4j</span>
+<span class="fc" id="L17">@RequiredArgsConstructor</span>
+public class CheckInService {
+
+    private final AttendanceService attendanceService;
+    private final AuthJwtService authJwtService;
+
+    public void checkIn(CheckInRequest input) {
+<span class="fc" id="L24">        Long lessonId = input.getLessonId();</span>
+<span class="fc" id="L25">        Long userId = input.getUserId();</span>
+<span class="fc" id="L26">        String token = input.getToken();</span>
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (!authJwtService.validateToken(token, userId)) {</span>
+<span class="fc" id="L28">            log.info(&quot;Token expired or userId mismatch.&quot;);</span>
+<span class="fc" id="L29">            throw new BadTokenException(PropertyFile.ERROR_INVALID_TOKEN.key());</span>
+        }
+<span class="fc" id="L31">        CheckInTokenPayload checkInTokenPayload = authJwtService.extractCheckInPayload(token);</span>
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (!isLessonIdValid(lessonId, checkInTokenPayload)) {</span>
+<span class="fc" id="L33">            log.info(&quot;Chosen lesson item not match your listing.&quot;);</span>
+<span class="fc" id="L34">            throw new BadTokenException(PropertyFile.ERROR_INVALID_LESSON_ITEM.key());</span>
+        }
+
+        try {
+<span class="fc" id="L38">            attendanceService.addAttendance(userId, lessonId);</span>
+<span class="fc" id="L39">        } catch (DataIntegrityViolationException | ConstraintViolationException e) {</span>
+<span class="fc" id="L40">            log.info(&quot;You are already checked in to this lesson, or lesson was removed.&quot;);</span>
+<span class="fc" id="L41">            throw new ConflictException(PropertyFile.ERROR_ALREADY_EXISTS.key());</span>
+<span class="fc" id="L42">        }</span>
+
+<span class="fc" id="L44">        log.info(&quot;userId : {} is successfully checkin to lessonId {}&quot;, userId, lessonId);</span>
+<span class="fc" id="L45">    }</span>
+
+    private boolean isLessonIdValid(Long lessonId, CheckInTokenPayload checkInTokenPayload) {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (checkInTokenPayload.getEligibleLessons() != null) {</span>
+<span class="fc" id="L49">            return checkInTokenPayload.getEligibleLessons().contains(lessonId);</span>
+        }
+<span class="fc" id="L51">        return false;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

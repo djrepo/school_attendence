@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClassroomActivityService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">school attendance enrollment backend</a> &gt; <a href="index.source.html" class="el_package">com.upwork.schoolattendance.services</a> &gt; <span class="el_source">ClassroomActivityService.java</span></div><h1>ClassroomActivityService.java</h1><pre class="source lang-java linenums">package com.upwork.schoolattendance.services;
+
+import com.upwork.schoolattendance.model.Attendance;
+import com.upwork.schoolattendance.model.Lesson;
+import com.upwork.schoolattendance.model.Classroom;
+import com.upwork.schoolattendance.model.User;
+import com.upwork.schoolattendance.model.exception.ConflictException;
+import com.upwork.schoolattendance.model.exception.DistanceException;
+import com.upwork.schoolattendance.model.exception.NoActivityFoundException;
+import com.upwork.schoolattendance.repository.UserRepository;
+import com.upwork.schoolattendance.resources.errors.PropertyFile;
+import com.upwork.schoolattendance.resources.model.ClassroomActivityRequest;
+import com.upwork.schoolattendance.resources.model.ClassroomActivityResponse;
+import com.upwork.schoolattendance.resources.model.CheckInTokenPayload;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L25">@Slf4j</span>
+<span class="fc" id="L26">@RequiredArgsConstructor</span>
+public class ClassroomActivityService {
+
+    private final LessonService lessonService;
+    private final UserRepository userRepository;
+    private final AuthJwtService authJwtService;
+    private final DistanceService distanceService;
+    private final AttendanceService attendanceService;
+
+    public ClassroomActivityResponse listClassroomActivity(ClassroomActivityRequest input) {
+<span class="fc" id="L36">        List&lt;Lesson&gt; lessons = lessonService.getEligibleLessonsByClassroomQrCode(input.getQrCode());</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        if (lessons.size() == 0) {</span>
+<span class="fc" id="L38">            log.info(&quot;No lesson found for qrCode {} and current time&quot;, input.getQrCode());</span>
+<span class="fc" id="L39">            throw new NoActivityFoundException();</span>
+        }
+<span class="fc" id="L41">        Classroom classroom = lessons.get(0).getClassroom();</span>
+<span class="fc" id="L42">        boolean isRemote = distanceService.isRemoteDistance(classroom.getLatitude(), classroom.getLongitude(), input.getLatitude(), input.getLongitude());</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (isRemote) {</span>
+<span class="fc" id="L44">            log.info(&quot;Trying to scan tokens from a remote location&quot;);</span>
+<span class="fc" id="L45">            throw new DistanceException();</span>
+        }
+
+<span class="fc" id="L48">        List&lt;Attendance&gt; assignedOnDateTime = attendanceService.getAttendanceForUserAndDateTime(input.getUserId(), LocalDateTime.now());</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (assignedOnDateTime.size()&gt;0){</span>
+<span class="fc" id="L50">                throw new ConflictException(PropertyFile.ERROR_ANOTHER_ATTENDANCE.key());</span>
+        }
+<span class="fc" id="L52">        Long userId = input.getUserId();</span>
+<span class="fc" id="L53">        User user = userRepository.findById(userId)</span>
+<span class="fc" id="L54">                .orElseThrow(() -&gt; new EntityNotFoundException(&quot;Could not found given id: &quot; + userId + &quot; in Student&quot;));</span>
+
+<span class="fc" id="L56">        return createClassroomActivityOutput(userId, classroom.getName(), lessons);</span>
+    }
+
+    private ClassroomActivityResponse createClassroomActivityOutput(long userId, String classroomName, List&lt;Lesson&gt; lessons) {
+<span class="fc" id="L60">        ClassroomActivityResponse output = new ClassroomActivityResponse();</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for (Lesson lesson : lessons) {</span>
+<span class="fc" id="L62">            output.setClassroom(classroomName);</span>
+<span class="fc" id="L63">            ClassroomActivityResponse.CurrentLesson currentLesson = new ClassroomActivityResponse.CurrentLesson();</span>
+<span class="fc" id="L64">            currentLesson.setSubject(lesson.getSubject().getName());</span>
+<span class="fc" id="L65">            currentLesson.setLessonId(lesson.getId());</span>
+<span class="fc" id="L66">            currentLesson.setStartTime(lesson.getStartTime());</span>
+<span class="fc" id="L67">            currentLesson.setEndTime(lesson.getEndTime());</span>
+<span class="fc" id="L68">            output.getCurrentLessons().add(currentLesson);</span>
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">        CheckInTokenPayload checkInTokenPayload = CheckInTokenPayload.builder()</span>
+<span class="fc" id="L71">                .eligibleLessons(lessons.stream().map(Lesson::getId).collect(Collectors.toList()))</span>
+<span class="fc" id="L72">                .build();</span>
+<span class="fc" id="L73">        output.setToken(authJwtService.generateToken(userId, checkInTokenPayload));</span>
+<span class="fc" id="L74">        return output;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

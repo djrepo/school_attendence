@@ -1,0 +1,58 @@
+
+= School attendance
+
+The `School attendance ` project is a simple Spring boot application with a HTTP endpoints that is running on
+localhost:8080.
+
+The `src/main` folder contains a simple 'School attendance Spring boot application.
+
+== Building the application
+
+To build the application, you use Maven:
+
+[source,shell]
+----
+mvn clean package -DskipTests
+----
+
+Maven will compile the application, and create jar file with embedded Tomcat server
+jar file is created in `target`.
+
+== Running the application
+
+To run the application, run the commands:
+
+[source,shell]
+----
+cd target
+java -jar enrollment-be-0.0.1-SNAPSHOT.jar
+----
+
+Once Tomcat is running, the REST api of application can be accessed at http://localhost:8080/
+see swagger documentation for details
+http://localhost:8080/swagger-ui/index.htm
+
+In this version there is no frontend.
+You can use postman collection from path _other/school attendence.postman_collection.json
+
+== Testing the application
+
+To run coverage junit tests you use this maven goal
+
+[source,shell]
+----
+clean test jacoco:report
+----
+
+To run integration tests to verify the application, you use Maven:
+
+[source,shell]
+----
+mvn verify
+----
+
+Tests in `src/test` are run against the server in `target/server`.
+
+== Resources
+
+* https://docs.spring.io/spring-boot/index.html[SpringBoot]

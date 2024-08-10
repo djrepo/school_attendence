@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthJwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">school attendance enrollment backend</a> &gt; <a href="index.source.html" class="el_package">com.upwork.schoolattendance.services</a> &gt; <span class="el_source">AuthJwtService.java</span></div><h1>AuthJwtService.java</h1><pre class="source lang-java linenums">package com.upwork.schoolattendance.services;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.upwork.schoolattendance.model.exception.BadTokenException;
+import com.upwork.schoolattendance.resources.errors.PropertyFile;
+import com.upwork.schoolattendance.resources.model.CheckInTokenPayload;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.function.Function;
+
+@Service
+<span class="fc" id="L16">@RequiredArgsConstructor</span>
+public class AuthJwtService {
+
+    private final JwtService jwtService;
+
+    private final ObjectMapper mapper;
+
+    private final static String CHECKIN_PAYLOAD = &quot;checkin_payload&quot;;
+
+
+    public CheckInTokenPayload extractCheckInPayload(String token) {
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (StringUtils.isEmpty(token)) {</span>
+<span class="fc" id="L28">            throw new BadTokenException(PropertyFile.ERROR_EMPTY_TOKEN.key());</span>
+        }
+<span class="fc" id="L30">        Function&lt;Claims, Object&gt; func = new Function&lt;Claims, Object&gt;(){</span>
+            @Override
+            public Object apply(Claims claims) {
+<span class="fc" id="L33">                return claims.get(CHECKIN_PAYLOAD);</span>
+            }
+        };
+<span class="fc" id="L36">        Object obj = jwtService.extractClaim(token, func);</span>
+<span class="fc" id="L37">        return mapper.convertValue(obj, CheckInTokenPayload.class);</span>
+    }
+
+
+    public String generateToken(long userId, CheckInTokenPayload checkInTokenPayload) {
+<span class="fc" id="L42">        return jwtService.generateToken(userId, Collections.singletonMap(CHECKIN_PAYLOAD, checkInTokenPayload));</span>
+    }
+
+
+    public boolean validateToken(String token, long userId) {
+<span class="fc" id="L47">        return jwtService.validateToken(token, userId);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

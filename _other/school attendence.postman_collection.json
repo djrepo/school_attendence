@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "54596886-d730-440d-8c60-219da68d9503",
+		"name": "school attendence",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "user 1 and classroom 1 /api/listClassroomActivity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"qrCode\": \"2f99d426-8ec6-4433-8ba9-2713787ba004\",\r\n\"userId\": 1,\r\n\"latitude\": 1,\r\n\"longitude\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/listClassroomActivity",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"listClassroomActivity"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user 1 and lesson 4 /api/checkIn",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\": 1,\r\n\"lessonId\": 4,\r\n\"token\": \"eyJhbGciOiJIUzI1NiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAA_6tWSs5ITc7OzIsvSKzMyU9MUbKqVkrNyUzPTMpJ9UktLs7PK1ayijaJrdVRKi5NUrJSMlTSUcpMLFGyMjQ3MjayNDezMNFRSq0ogAlYWFiY1AIAM53q5VcAAAA.5hhqFqx5wtMjyEuHuCyxfEwium0d31-1hmclj5nGD3E\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/checkIn",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"checkIn"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user 2 and classroom 2 /api/listClassroomActivity",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"qrCode\": \"dae631a8-f32d-4dab-a4a2-4c30dfc370ba\",\r\n\"userId\": 2,\r\n\"latitude\": 1,\r\n\"longitude\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/listClassroomActivity",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"listClassroomActivity"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user 2 and lesson 11 /api/checkIn Copy",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\": 2,\r\n\"lessonId\": 11,\r\n\"token\": \"eyJhbGciOiJIUzI1NiIsInppcCI6IkdaSVAifQ.H4sIAAAAAAAA_zXISwqAIBQF0L3csRMN8bOGdhARao-SRAULCmnvjTrD0xF2CkfMS3VPKm6F7aAUt-gTjdRayQ124nx-GdrlYSHAEN0Jy5UYhFFKSwa66x_aaPl-25LbSlgAAAA.DJiHlUiu61c1UItxVT56RbhEC7uh320ds23PvXpPZ8w\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/checkIn",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"checkIn"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,37 @@
+server:
+  port: 8080
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+  
+spring:
+  datasource:
+    url: jdbc:h2:file:./attendance;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: sa
+  h2:
+    console:
+      path: /h2
+      enabled: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    properties:
+      '[hibernate.default_batch_fetch_size]': 100
+      '[hibernate.format_sql]': true
+    show-sql: true
+  output: 
+    ansi:
+      enabled: always
+
+jwt:
+  base64-min256bit-secret: H5rbI9WhUMMtkuBA18LKCU3YqY/08+F7fL7JaCaM5C0=
+  token:
+    lifespan: 600
+
+logging:
+  level:
+    '[com.upwork.schoolattendance]': DEBUG
